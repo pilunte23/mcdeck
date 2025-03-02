@@ -95,7 +95,10 @@ class MCPdf(FPDF):
 
         if self.__args.background:
             dir = self.__args.backgroundDir
-            imagePath = f"{dir}/{heroName}.png"
+            if heroName == "SP//dr Suit":
+                imagePath = f"{dir}/Spdr Suit.png"
+            else:
+                imagePath = f"{dir}/{heroName}.png"
             if os.path.exists(imagePath):
                 self.image(imagePath, w=self.cardWidth, h=self.cardHeight)        
                 self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth
