@@ -24,7 +24,7 @@ class MCRepo():
         'ally': {
             'de': 'Verb\u00fcndeter',
             'es': 'Aliado',
-            'fr': 'Ali\u00e9es',
+            'fr': 'Alli\u00e9s',
             'it': 'Alleato'
         },
         'upgrade':{
@@ -39,6 +39,12 @@ class MCRepo():
             'fr':'\u00c9v\u00e8nements',
             'it': 'Evento'
         },
+        'player side scheme':{
+            'de': 'Spieler-Seitenplan',
+            'es': 'Esquema del lado del jugador',
+            'fr': 'Manigances annexes joueur',
+            'it': 'Schema laterale del giocatore'
+        },
         'support':{
             'de': 'Vorteil',
             'es': 'Apoyo',
@@ -50,7 +56,7 @@ class MCRepo():
             'es': 'Recurso',
             'fr': 'Ressource',
             'it': 'Risorsa'
-        },
+        },     
         'other':{
             'de': 'Andere',
             'es': 'Otros',
@@ -145,6 +151,11 @@ class MCRepo():
                 icon = 'resources/hero-blue.png'
             else:
                 icon = 'resources/leadership.png'
+        elif cardResponse['faction_code']=='pool':
+            if 'card_set_type_name_code' in cardResponse:
+                icon = 'resources/hero-pool.png'
+            else:
+                icon = 'resources/pool.png'
         else:
             icon = 'resources/hero-black.png'
 
@@ -160,6 +171,8 @@ class MCRepo():
             cardType = 'Support'
         elif cardResponse['type_code']=='resource':
             cardType = 'Resource'
+        elif cardResponse['type_code']=='player_side_scheme':
+            cardType = 'Player Side Scheme'
         else:
             cardType = 'Other'
 
@@ -207,8 +220,8 @@ class MCRepo():
 
         # add another cell
         deck["name"] = deckTitle
-        deck["hero"] = deckResponse["investigator_name"]
-        deck["code"] = deckResponse["investigator_code"]
+        deck["hero"] = deckResponse["hero_name"]
+        deck["code"] = deckResponse["hero_code"]
         deck["version"] = deckResponse["version"]
         deck["url"] = self.__getUrl("deck/view",deckId)
 
@@ -221,6 +234,7 @@ class MCRepo():
             deck['sections'][self.__localise('Event')] = {"count":0, "cards":[]}
             deck['sections'][self.__localise('Support')] = {"count":0, "cards":[]}
             deck['sections'][self.__localise('Resource')] = {"count":0, "cards":[]}
+            deck['sections'][self.__localise('Player Side Scheme')] = {"count":0, "cards":[]}
 
         cards = deckResponse["slots"].items()
         for cardId, cardQuantity in self.__progress.apply(cards, desc="Loading Card", leave=False):

@@ -133,7 +133,6 @@ dmypy.json
 
 # Project
 cache
-resources/*
 !resources/background
 input/*
 !input/sample.txt

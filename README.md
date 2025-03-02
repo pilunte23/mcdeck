@@ -63,7 +63,7 @@ options:
   -u, --unfold          To unfold the identity section. By default the section is 'Folded'.
   -b, --background      Set background feature to 'on'. By default the feature is 'off'
   -bd BACKGROUND_DIR, --background_dir BACKGROUND_DIR
-                        To specify where to find background Image. By default in 'resource/background'
+                        To specify where to find background Image. By default in 'resources/background'
   -ifs {B,I,BI}, --item_font_style {B,I,BI}
                         Set font style for item text. By default no style is applied.
   -a {public}, --api {public}

@@ -30,7 +30,7 @@ class MCArgs():
         parser.add_argument('-pf','--page_format',choices=['A3','A4','A5','Letter','Legal'], default='A4', help='The format used for pages. By default A4')
         parser.add_argument('-u', '--unfold', action='store_true', help='To unfold the identity section. By default the section is \'Folded\'.')
         parser.add_argument('-b', '--background', action='store_true', help='Set background feature to \'on\'. By default the feature is \'off\'')
-        parser.add_argument('-bd', '--background_dir', default='resources/background', help='To specify where to find background Image. By default in \'resource/background\'')
+        parser.add_argument('-bd', '--background_dir', default='resources/background', help='To specify where to find background Image. By default in \'resources/background\'')
         parser.add_argument('-ifs', '--item_font_style', choices=['B','I','BI'], default='', help='Set font style for item text. By default no style is applied.')
         parser.add_argument('-a','--api',choices=['public'], default='public', help='Kind of API endpoint to use. By default the \'public\' api is used. For instance only public api is supported.')
         parser.add_argument('-i', '--input', help='Input text file containing a list of deck Id. (One Id by line)')
