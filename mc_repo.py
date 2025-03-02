@@ -42,7 +42,7 @@ class MCRepo():
         'player side scheme':{
             'de': 'Spieler-Seitenplan',
             'es': 'Esquema del lado del jugador',
-            'fr': 'Manigances annexes joueur',
+            'fr': 'Manigance annexe joueur',
             'it': 'Schema laterale del giocatore'
         },
         'support':{
@@ -104,9 +104,11 @@ class MCRepo():
         else:
             response = requests.get(self.__getUrl(path, id))
             try:
+                print(response.json())
                 json_str = json.dumps(response.json(), sort_keys=True, indent=4)
                 json_str = json_str.replace('\\u0152','OE').replace('\\u0153','oe')
                 json_str = json_str.replace("\\u2018","'" ).replace("\\u2019","'" )
+                json_str = json_str.replace("\\u201c",'\\"' ).replace("\\u201d",'\\"')
                 self.__jwrite(fileName, json_str)
                 return json.loads(json_str)
             except Exception:
@@ -181,7 +183,8 @@ class MCRepo():
         card = {
             "name": cardResponse["name"],
             "quantity": cardQuantity,
-            "icon":icon
+            "icon":icon,
+            "url": cardResponse["url"],
         }
         return card, cardType, packName
 
@@ -204,8 +207,9 @@ class MCRepo():
             deckResponse = self.__fetch(self.__deckPath, deckId)
         except Exception:
             raise
-
-        deckTitle = deckResponse["name"] if jdeck['title'] == None else jdeck['title']
+        
+        print(deckResponse)
+        deckTitle = jdeck['title'] if 'title' in jdeck else deckResponse["name"]
 
         deck = {
             "name": "",

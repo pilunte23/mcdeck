@@ -10,7 +10,8 @@ class MCPdf(FPDF):
     __progress: MCProgress = None
 
     __alternativeHeroNames = {
-        '27030a':'Spider-Man - Miles Morales'
+        '27030a':'Spider-Man - Miles Morales',
+        '31001a':'SP//dr Suit'
     }
 
     def __init__(self, args, progress):
@@ -75,7 +76,7 @@ class MCPdf(FPDF):
                 self.y = y
 
                 self.x += 2
-                self.cell(4, 2.8, txt = f"{card['quantity']}X",ln = 0, align = 'L')
+                self.cell(4, 2.8, txt = f"{card['quantity']}X",ln = 0, align = 'L', link = card['url'])
                 self.multi_cell(22, 2.8, txt = card['name'], align = 'L', border = 0)
                 self.x = x
                 self.y += 0.2
@@ -89,6 +90,7 @@ class MCPdf(FPDF):
 
         deckName = deck["name"]
         heroName = self.__alternativeHeroNames.get(deck["code"], deck["hero"])
+
 
         self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth
         self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight
@@ -105,7 +107,7 @@ class MCPdf(FPDF):
                 self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight
 
         self.set_font("Arial", size = 6, style = 'UB')
-        self.cell(62, 6, txt = f"{deckName}", ln = 0, align = 'C', border = 0)
+        self.cell(62, 6, txt = f"{deckName}", ln = 0, align = 'C', border = 0,link = deck['url'])
         
         self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth
         self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 4

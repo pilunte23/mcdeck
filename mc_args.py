@@ -73,5 +73,4 @@ class MCArgs():
                     while (line := file.readline()):
                         words = line.split()
                         if len(words) > 0 and not words[0].startswith('#'):
-                            #self.deckIds.append(words[0])
-                            self.jdecks.append({"id":words[0],"title":None})
+                            self.jdecks.append({"id":words[0]})
