@@ -70,6 +70,10 @@ options:
                         Kind of API endpoint to use. By default the 'public' api is used. For instance only public api is supported.
   -i INPUT, --input INPUT
                         Input text file containing a list of deck Id. (One Id by line)
+                        or
+                        Input json file 
+                        or 
+                        List of id deck with space 
   -v, --version         show program's version number and exit
   ```
 
@@ -79,7 +83,7 @@ options:
 
 Use 1 or more ids to generate deck cards on "./output/output.pdf".
 
-> python mcdeck.py 260621 260622 26062
+> python mcdeck.py -i "260621 260622 26062"b
 
 ![Sample 01](/images/sample_01.PNG)
 

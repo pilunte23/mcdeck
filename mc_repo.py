@@ -42,7 +42,7 @@ class MCRepo():
         'player side scheme':{
             'de': 'Spieler-Seitenplan',
             'es': 'Esquema del lado del jugador',
-            'fr': 'Manigance annexe joueur',
+            'fr': 'Manigance joueur',
             'it': 'Schema laterale del giocatore'
         },
         'support':{
@@ -104,7 +104,7 @@ class MCRepo():
         else:
             response = requests.get(self.__getUrl(path, id))
             try:
-                print(response.json())
+                #print(response.json())
                 json_str = json.dumps(response.json(), sort_keys=True, indent=4)
                 json_str = json_str.replace('\\u0152','OE').replace('\\u0153','oe')
                 json_str = json_str.replace("\\u2018","'" ).replace("\\u2019","'" )
@@ -179,13 +179,17 @@ class MCRepo():
             cardType = 'Other'
 
         packName = cardResponse["pack_name"]
-
+        
+        if self.__args.language:
+            cardResponse["url"] = cardResponse["url"].replace("https://marvelcdb.com", f"https://{self.__args.language}.marvelcdb.com")
         card = {
             "name": cardResponse["name"],
             "quantity": cardQuantity,
             "icon":icon,
-            "url": cardResponse["url"],
+            "url": cardResponse["url"]
         }
+        
+
         return card, cardType, packName
 
     #---------------------------------------------
@@ -208,7 +212,7 @@ class MCRepo():
         except Exception:
             raise
         
-        print(deckResponse)
+        #print(deckResponse)
         deckTitle = jdeck['title'] if 'title' in jdeck else deckResponse["name"]
 
         deck = {
@@ -220,7 +224,7 @@ class MCRepo():
             "sections":{}
         }
 
-        identitySectionName = self.__localise("Identity")
+        identitySectionName = self.__localise("hero")
 
         # add another cell
         deck["name"] = deckTitle

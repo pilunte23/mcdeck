@@ -29,13 +29,14 @@ class MCArgs():
         parser.add_argument('-po','--page_orientation',choices=['P','L'], default='P', help='Default page orientation. Portrait or Landscape. By default Portrait (P)')
         parser.add_argument('-pf','--page_format',choices=['A3','A4','A5','Letter','Legal'], default='A4', help='The format used for pages. By default A4')
         parser.add_argument('-u', '--unfold', action='store_true', help='To unfold the identity section. By default the section is \'Folded\'.')
-        parser.add_argument('-b', '--background', action='store_true', help='Set background feature to \'on\'. By default the feature is \'off\'')
-        parser.add_argument('-bd', '--background_dir', default='resources/background', help='To specify where to find background Image. By default in \'resources/background\'')
+        parser.add_argument('-b', '--background', choices=['off','original', 'alternate'], default='original', help='Set background feature to \'original\' or \'alternate\'. By default the feature is \'original\'')
+        #parser.add_argument('-bd', '--background_dir', default='resources/background', help='To specify where to find background Image. By default in \'resources/background\'')
         parser.add_argument('-ifs', '--item_font_style', choices=['B','I','BI'], default='', help='Set font style for item text. By default no style is applied.')
         parser.add_argument('-a','--api',choices=['public'], default='public', help='Kind of API endpoint to use. By default the \'public\' api is used. For instance only public api is supported.')
         parser.add_argument('-i', '--input', help='Input text file containing a list of deck Id. (One Id by line)')
         #parser.add_argument('-o','--output', default='output/output.pdf', help='Output pdf file. By default \'output/output.pdf\'')
         parser.add_argument('-v','--version', action='version', version='%(prog)s ' + mc_version.__version__)
+        #TODO parser.add_argument('-n', '--no-cache', help='Clean cache before fetching data.', action='store_true')
         parser.add_argument('deckIds', metavar='ID', type=int, nargs='*', default=[], help='Optional list of deck Ids')
 
         args = parser.parse_args()
@@ -46,22 +47,31 @@ class MCArgs():
         self.unfold = args.unfold
         self.itemFontStyle = args.item_font_style
         self.background = args.background
-        self.backgroundDir = args.background_dir
+
+        self.backgroundDir = "resources/background-" + args.background
+        #self.backgroundDir = args.background_dir
         #self.output = args.output 
 
         self.sortingMode =  SortingMode.BY_TYPE if args.sort=='by_type' else SortingMode.BY_SET
         
         #self.output += '.pdf' if not args.output.lower().endswith('.pdf') else ''
         self.output = 'output/'
-        self.output += Path(args.input).stem if args.input is not None else 'output'
+        #self.output += Path(args.input).stem if args.input is not None else 'output'
+        self.output += 'output'
         self.output += '.pdf'
+
+        #if args.no_cache:
+        #    cache_dir = Path('cache')
+        #    for deck_dir in cache_dir.glob('deck*'):
+        #        for json_file in deck_dir.glob('*.json'):
+        #            json_file.unlink()
 
         directory = os.path.dirname(self.output)
         if os.path.isdir(directory) == False:
             os.mkdir(directory)
 
         for deckId in args.deckIds:
-            self.jdecks.append({"id":f'{deckId}',"title":None})
+            self.jdecks.append({"id":f'{deckId}'})
         #self.deckIds = args.deckIds
         if args.input is not None:
             with open(args.input) as file:
@@ -74,3 +84,4 @@ class MCArgs():
                         words = line.split()
                         if len(words) > 0 and not words[0].startswith('#'):
                             self.jdecks.append({"id":words[0]})
+        print(self.jdecks)
