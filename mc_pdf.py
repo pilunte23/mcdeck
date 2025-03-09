@@ -1,8 +1,7 @@
-import os.path
-
 from fpdf import FPDF
 from mc_args import MCArgs
 from mc_progress import MCProgress
+import os
 
 class MCPdf(FPDF):
     
@@ -25,15 +24,16 @@ class MCPdf(FPDF):
         self.cardWidth = 62
         self.cardHeight = 88
         self.columlIndexX = 0
-        self.columnWidth = 24
-        self.columnMarginTop = 20
-        self.columnMarginStart = 6
+        self.columnWidth = 24 if args.background == 'original' else 31
+        self.columnMarginTop = 20 if args.background == 'original' else 9
+        self.columnMarginStart = 6 if args.background == 'original' else 2
         self.set_fill_color(230)
         self.set_font("Arial", size = 6)
-        self.add_font('Exo2', '', r'./resources/font/Exo2-Bold.ttf', uni=True)
-        self.add_font('Komika', '', r'./resources/font/KOMIKAX_.ttf', uni=True)
-        self.add_font('Avenir', '', r'./resources/font/Avenir-Next-LT-Pro-Regular.ttf', uni=True)
-        
+        if args.background == 'original':
+            self.add_font('Exo2', '', r'./resources/font/Exo2-Bold.ttf', uni=True)
+            self.add_font('Komika', '', r'./resources/font/KOMIKAX_.ttf', uni=True)
+            self.add_font('Avenir', '', r'./resources/font/Avenir-Next-LT-Pro-Regular.ttf', uni=True)
+
         self.x = self.pageMarginWidth
         self.y = self.pageMarginHeight
 
@@ -50,28 +50,28 @@ class MCPdf(FPDF):
             y = self.pageMarginHeight + yIndex * self.cardHeight
             self.line(0,y,self.w,y)
 
-    def __drawDeckSection(self,title,cards,count):
+    def __drawDeckSection(self, title, cards, count):
         if count > 0:
-            self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth + self.columlIndexX*self.columnWidth + self.columnMarginStart
+            self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth + self.columlIndexX * self.columnWidth + self.columnMarginStart
 
-            if (self.y-self.pageMarginHeight-self.cardIndexY*self.cardHeight) > self.cardHeight - 12:
+            if (self.y - self.pageMarginHeight - self.cardIndexY * self.cardHeight) > self.cardHeight - 12:
                 self.columlIndexX = 1
-                self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + self.columnMarginTop
-                self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth + self.columlIndexX*self.columnWidth + self.columnMarginStart
+                self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight + self.columnMarginTop
+                self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth + self.columlIndexX * self.columnWidth + self.columnMarginStart
 
-            self.set_font("Komika", size = 4.5, style = 'U')
-            self.cell(20, 3, txt = f"{title} ({count})",ln = 2, align = 'L')
+            self.set_font("Komika" if self.__args.background == 'original' else "Arial", size = 4.5, style = 'U')
+            self.cell(20, 3, txt = f"{title} ({count})", ln = 2, align = 'L')
 
-            self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth + self.columlIndexX*self.columnWidth + self.columnMarginStart
+            self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth + self.columlIndexX * self.columnWidth + self.columnMarginStart
             self.y += 0.7
 
-            self.set_font("Avenir", size = 5.5, style = self.__args.itemFontStyle)
-            cards.sort(key=lambda card: 'a' if card['icon']=='resources/basic.png' else card['icon']) 
+            self.set_font("Avenir" if self.__args.background == 'original' else "Arial", size = 5.5, style = self.__args.itemFontStyle)
+            cards.sort(key=lambda card: 'a' if card['icon'] == 'resources/basic.png' else card['icon'])
             for card in cards:
-                if (self.y-self.pageMarginHeight-self.cardIndexY*self.cardHeight) > self.cardHeight - 8:
+                if (self.y - self.pageMarginHeight - self.cardIndexY * self.cardHeight) > self.cardHeight - 8:
                     self.columlIndexX = 1
-                    self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + self.columnMarginTop
-                    self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth + self.columlIndexX*self.columnWidth + self.columnMarginStart
+                    self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight + self.columnMarginTop
+                    self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth + self.columlIndexX * self.columnWidth + self.columnMarginStart
 
                 x = self.x
                 y = self.y
@@ -79,21 +79,19 @@ class MCPdf(FPDF):
                 self.y = y
 
                 self.x += 2
-                self.cell(4, 2.8, txt = f"{card['quantity']}X",ln = 0, align = 'L', link = card['url'])
+                self.cell(4, 2.8, txt = f"{card['quantity']}X", ln = 0, align = 'L', link = card['url'])
                 self.multi_cell(18, 2.8, txt = card['name'], align = 'L', border = 0)
                 self.x = x
                 self.y += 0.2
             self.y += 0.7
 
-    def __drawDeck(self,deck):
-
+    def __drawDeck(self, deck):
         totalCount = 0
         for section in deck['sections'].values():
             totalCount += section["count"]
 
         deckName = deck["name"]
         heroName = self.__alternativeHeroNames.get(deck["code"], deck["hero"])
-
 
         self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth
         self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight
@@ -103,57 +101,69 @@ class MCPdf(FPDF):
             if heroName == "SP//dr Suit":
                 imagePath = f"{dir}/Spdr Suit.png"
             else:
-                imagePath = f"{dir}/{heroName}.png"
+                imagePath = f"{dir}/{heroName}.png" 
             if os.path.exists(imagePath):
-                self.image(imagePath, w=self.cardWidth, h=self.cardHeight)        
+                self.image(imagePath, w=self.cardWidth, h=self.cardHeight)
                 self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth
                 self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight
 
-        self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth
-        self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 4.2
-        self.set_font("Exo2", size = 12) 
-        self.cell(62, 4, txt = f"{heroName}", ln = 0, align = 'C', border = 0,link = deck['url'])      
-        self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth + 3
-        self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 15.5
-        self.set_font("Komika", size = 6)
-        text = f"{deckName} (v{deck['version']})"
-        text_width = self.get_string_width(text)
-        if text_width > 56:
-            self.set_font("Komika", size = 5 * (56 / text_width))
-        self.multi_cell(56, 2, txt = text, align = 'C', border = 0)
-        
+  
+        if self.__args.background == 'original':
+            self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth
+            self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 4.2
+            self.set_font("Exo2", size = 12) 
+            self.cell(62, 4, txt = f"{heroName}", ln = 0, align = 'C', border = 0,link = deck['url'])      
+            self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth + 6
+            self.set_font("Komika", size = 6)
+            text = f"{deckName} (v{deck['version']})"
+            text_width = self.get_string_width(text)
+            if text_width > 56:
+                self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 14.5
+                self.set_font("Komika", size = 4)
+            else:
+                self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 15.5
+            self.multi_cell(50, 2, txt = text, align = 'C', border = 0)
+        else:
+            self.set_font("Arial", size = 6, style = 'UB')
+            self.cell(62, 6, txt = f"{deckName}", ln = 0, align = 'C', border = 0)
+            self.x = self.pageMarginWidth + self.cardIndexX*self.cardWidth
+            self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + 4
+            self.set_font("Arial", size = 6, style = 'I')
+            self.cell(62, 4, txt = f"{heroName} ({totalCount})", ln = 0, align = 'C', border = 0)
+
+
         self.columlIndexX = 0
 
-        self.y = self.pageMarginHeight + self.cardIndexY*self.cardHeight + self.columnMarginTop
+        self.y = self.pageMarginHeight + self.cardIndexY * self.cardHeight + self.columnMarginTop
 
         for sectionType, section in deck['sections'].items():
             self.__drawDeckSection(sectionType, section["cards"], section["count"])
 
-        #self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth 
-        #self.y = self.pageMarginHeight + (self.cardIndexY+1) * self.cardHeight 
-        #self.set_font("Arial", size = 5, style = 'I')
-        #self.cell(2, 6, txt = f"(v{deck['version']})",ln = 0, align = 'L', border = 0)
-        #self.cell(60, 6, txt = deck['url'],ln = 0, align = 'R', border = 0, link = deck['url'])
+        if self.__args.background == 'alternate':
+            self.x = self.pageMarginWidth + self.cardIndexX * self.cardWidth
+            self.y = self.pageMarginHeight + (self.cardIndexY + 1) * self.cardHeight - 5
+            self.set_font("Arial", size = 5, style = 'I')
+            self.cell(2, 6, txt = f"(v{deck['version']})", ln = 0, align = 'L', border = 0)
+            self.cell(60, 6, txt = deck['url'], ln = 0, align = 'R', border = 0, link = deck['url'])
 
-    def drawDecks(self,decks):
+    def drawDecks(self, decks):
         count = 1
-        for deck in self.__progress.apply(decks,desc="Create Pdf  "):
+        for deck in self.__progress.apply(decks, desc="Create Pdf  "):
             if count > self.nbCardOnPage:
-                self.__drawCutLines() # Draw cut lines before to add new one
+                self.__drawCutLines()  # Draw cut lines before to add new one
                 count = 1
-            if count==1:
+            if count == 1:
                 self.add_page()
-            self.cardIndexX = (count-1)%self.nbCardOnPageWidth
-            self.cardIndexY = (count-1)//self.nbCardOnPageWidth
+            self.cardIndexX = (count - 1) % self.nbCardOnPageWidth
+            self.cardIndexY = (count - 1) // self.nbCardOnPageWidth
             self.rect(
-                self.pageMarginWidth + self.cardIndexX*self.cardWidth,
-                self.pageMarginHeight + self.cardIndexY*self.cardHeight,
+                self.pageMarginWidth + self.cardIndexX * self.cardWidth,
+                self.pageMarginHeight + self.cardIndexY * self.cardHeight,
                 self.cardWidth,
                 self.cardHeight,
-                style = 'F'
+                style='F'
             )
             self.__drawDeck(deck)
-            count+=1
-        if count>1:
+            count += 1
+        if count > 1:
             self.__drawCutLines()
-
